@@ -76,3 +76,6 @@ $RECYCLE.BIN/
 *.lnk
 
 tmp
+node_modules
+bower_components
+package-lock.json
