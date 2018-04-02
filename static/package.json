@@ -4,7 +4,7 @@
   "description": "Simple boilerplate for go/react web apps.",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +19,7 @@
     "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
+    "jest": "^22.4.3",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",
     "babel-polyfill": "^6.26.0",

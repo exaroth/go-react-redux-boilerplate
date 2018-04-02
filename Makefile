@@ -9,11 +9,15 @@ serve:
 	fresh;
 
 watch:
-	cd ./static && webpack --config webpack.config.dev.js
+	cd ./static && webpack --config webpack.config.dev.js;
+
+test:
+	go test;
+	cd ./static && npm test;
 
 install:
-	go get -v ./...
-	go get github.com/pilu/fresh
+	go get -v ./...;
+	go get github.com/pilu/fresh;
 	cd static && npm install;
 
 compile:
