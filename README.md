@@ -1,3 +1,4 @@
-## Go web app boilerplate
+## Go/React/Redux web app boilerplate
 
-Simple boilerplate for go web apps, using default http server.
+Simple boilerplate for Go/React/Redux web apps, using default http server.
+

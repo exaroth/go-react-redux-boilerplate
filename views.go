@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func initViews(router *mux.Router, config *MainConfig) {
+func initViews(router *mux.Router, c *MainConfig) {
 
 	defaultHeaders := map[string]string{
 		"Content-Type": "text/html",
@@ -13,18 +13,21 @@ func initViews(router *mux.Router, config *MainConfig) {
 
 	getContext := func() map[string]interface{} {
 		return map[string]interface{}{
-			"development": config.DevEnv,
-			"appName":     config.AppName,
+			"developmentEnv": c.DevEnv,
+			"appName":        c.AppName,
 		}
 	}
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tpl := config.GetTemplate("index.tpl")
-		err := tpl.Execute(w, getContext())
+		err := RenderTemplate(w, c.GetTemplate("index"), getContext(), defaultHeaders)
 		if err != nil {
+			Log.Error("", err, r)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
 		}
-		SetHeaders(w, defaultHeaders)
 	})
+	router.HandleFunc("/healthz",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("OK"))
+			return
+		})
 }

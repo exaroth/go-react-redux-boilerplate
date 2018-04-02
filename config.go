@@ -15,17 +15,25 @@ const (
 	templateExt               = ".tpl"
 	defaultHostname           = "127.0.0.1"
 	version                   = "0.0.1"
+	lLevelWarning             = "warning"
+	lLevelInfo                = "info"
+	lLevelError               = "error"
 )
 
 const (
-	defaultPort int = 9000
+	defaultPort     int = 9000
+	defaultLogLevel     = 1
 )
 
 // Env variable names
 const (
-	envPrefix  string = appName
-	envDev            = "DEVELOPMENT"
-	envApiAddr        = "API_ADDR"
+	envPrefix      string = appName
+	envDev                = "DEVELOPMENT"
+	envHostname           = "APP_HOSTNAME"
+	envPort               = "APP_PORT"
+	envLogDisabled        = "LOGGING_DISABLED"
+	envLogLevel           = "LOG_LEVEL"
+	envLogRequests        = "LOG_REQUESTS"
 )
 
 type MainConfig struct {
@@ -33,11 +41,14 @@ type MainConfig struct {
 	Hostname    string
 	Templates   *template.Template
 	DevEnv      bool
-	ApiAddr     string
 	AppName     string
 	StaticDir   string
 	TemplateDir string
 	Version     string
+	// Logging options
+	LogDisabled    bool
+	LogLevel       uint8
+	LogRequestData bool
 }
 
 func (c *MainConfig) LoadTemplates() error {
@@ -60,6 +71,7 @@ func (c *MainConfig) LoadTemplates() error {
 }
 
 func (c *MainConfig) GetTemplate(tplName string) *template.Template {
+	tplName = fmt.Sprintf("%s%s", tplName, templateExt)
 	return c.Templates.Lookup(tplName)
 }
 
@@ -70,22 +82,37 @@ func getConfig() (cfg *MainConfig, err error) {
 	cfg = &MainConfig{}
 
 	cfg.DevEnv = (viper.GetInt(envDev) == 1)
-	cfg.ApiAddr = viper.GetString(envApiAddr)
-	if cfg.ApiAddr == "" {
-	}
-	cfg.Hostname = viper.GetString("APP_HOSTNAME")
+
+	cfg.Hostname = viper.GetString(envHostname)
 	if cfg.Hostname == "" {
 		cfg.Hostname = defaultHostname
+	}
+	cfg.Port = viper.GetInt(envPort)
+	if cfg.Port == 0 {
+		cfg.Port = defaultPort
+	}
+	cfg.LogDisabled = (viper.GetInt(envLogDisabled) == 1)
+	cfg.LogRequestData = (viper.GetInt(envLogRequests) == 1)
+
+	lLevelStr := viper.GetString(envLogLevel)
+	switch lLevelStr {
+	case lLevelError:
+		cfg.LogLevel = 2
+		break
+	case lLevelWarning:
+		cfg.LogLevel = 1
+		break
+	case lLevelInfo:
+		cfg.LogLevel = 0
+		break
+	default:
+		cfg.LogLevel = defaultLogLevel
 	}
 
 	cfg.AppName = appName
 	cfg.Version = version
 	cfg.StaticDir = defaultStaticDir
 
-	cfg.Port = viper.GetInt("APP_PORT")
-	if cfg.Port == 0 {
-		cfg.Port = defaultPort
-	}
 	err = func(funcs ...func() error) (er error) {
 		for _, f := range funcs {
 			if er = f(); er != nil {
@@ -95,7 +122,7 @@ func getConfig() (cfg *MainConfig, err error) {
 		return
 	}(
 		cfg.LoadTemplates,
-		// Put loader funcs here
+		// Put config loader funcs here
 	)
 	return
 }

@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"html/template"
 	"net/http"
 )
 
@@ -28,7 +30,6 @@ func SendJSONResponse(w http.ResponseWriter, data interface{}, headers map[strin
 		SetHeaders(w, headers)
 	}
 	SetHeaders(w, defaultJSONHeaders)
-	w.WriteHeader(http.StatusOK)
 	return nil
 }
 
@@ -42,4 +43,16 @@ func SendJSONError(w http.ResponseWriter, err error) {
 	}
 	return
 
+}
+
+func RenderTemplate(w http.ResponseWriter, tpl *template.Template, ctx map[string]interface{}, headers map[string]string) error {
+	if tpl == nil {
+		return fmt.Errorf("Template not found")
+	}
+	err := tpl.Execute(w, ctx)
+	if err != nil {
+		return err
+	}
+	SetHeaders(w, headers)
+	return nil
 }

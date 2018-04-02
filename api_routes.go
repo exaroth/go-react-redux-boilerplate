@@ -5,12 +5,11 @@ import (
 	"net/http"
 )
 
-func initAPI(router *mux.Router, config *MainConfig) {
+func initAPI(router *mux.Router, c *MainConfig) {
 	apiRouter := router.PathPrefix("/api").Subrouter()
-
 	apiRouter.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
 		err := SendJSONResponse(w, map[string]string{
-			"version": config.Version,
+			"version": c.Version,
 		}, defaultJSONHeaders)
 		if err != nil {
 			SendJSONError(w, err)
