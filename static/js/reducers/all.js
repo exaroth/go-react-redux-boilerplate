@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 
-import exampleReducer from 'reducers/example_reducer';
+import config from 'reducers/config_reducer';
 
 export default combineReducers({
-  exampleReducer,
+  config,
 });

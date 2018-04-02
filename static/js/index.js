@@ -4,12 +4,12 @@ import { Provider } from 'react-redux';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import { initStore } from 'utils/react' 
-import reducersAggregator from 'reducers/store_aggregator';
+import allReducers from 'reducers/all';
 import App from 'components/app';
 
 function initApp() {
   let appContainer = (
-    <Provider store={ initStore(reducersAggregator) }>
+    <Provider store={ initStore(allReducers) }>
       <MuiThemeProvider>
         <App />
       </MuiThemeProvider>

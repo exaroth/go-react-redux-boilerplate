@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"net/http"
 )
 
@@ -23,7 +22,6 @@ func SendJSONResponse(w http.ResponseWriter, data interface{}, headers map[strin
 	enc := json.NewEncoder(w)
 	err := enc.Encode(data)
 	if err != nil {
-		// TODO: handle err here
 		return err
 	}
 	if headers != nil {
@@ -38,16 +36,16 @@ func SendJSONError(w http.ResponseWriter, err error) {
 		"error": err.Error(),
 	}, nil)
 	if e != nil {
-		// log
+		Log.Error("", e, nil)
 		panic(e)
 	}
 	return
-
 }
 
-func RenderTemplate(w http.ResponseWriter, tpl *template.Template, ctx map[string]interface{}, headers map[string]string) error {
+func RenderTemplate(w http.ResponseWriter, tplName string, ctx map[string]interface{}, headers map[string]string) error {
+	tpl := Config.GetTemplate(tplName)
 	if tpl == nil {
-		return fmt.Errorf("Template not found")
+		return fmt.Errorf("Template %s not found", tplName)
 	}
 	err := tpl.Execute(w, ctx)
 	if err != nil {

@@ -2,12 +2,12 @@ import { bindActionCreators, createStore, applyMiddleware } from 'redux';
 import { connect } from 'react-redux';
 import thunk from 'redux-thunk';
 
-import actions from 'actions/actions_aggregator';
+import allActions from 'actions/all';
 
 export function connectedComponent(component, options) {
   return connect(
     state => state,
-    dispatch => bindActionCreators(actions, dispatch),
+    dispatch => bindActionCreators(allActions, dispatch),
     (stateProps, dispatchProps, ownProps) => Object.assign({}, ownProps, stateProps, dispatchProps),
     options
   )(component);

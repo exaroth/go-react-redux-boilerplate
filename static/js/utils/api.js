@@ -65,10 +65,10 @@ class API {
   /*
   * Backend calls
   */
-  getVersion() {
+  getConfig() {
     return this._call({
       method: 'get',
-      url: '/version',
+      url: '/config',
     });
   }
 

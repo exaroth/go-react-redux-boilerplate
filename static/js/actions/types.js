@@ -1,1 +1,1 @@
-export const EXAMPLE_ACTION = "EXAMPLE_ACTION";
+export const SET_CONFIG = "SET_CONFIG";

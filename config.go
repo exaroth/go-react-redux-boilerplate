@@ -70,48 +70,56 @@ func (c *MainConfig) LoadTemplates() error {
 	return err
 }
 
+func (c *MainConfig) GetAddress() string {
+	return fmt.Sprintf("%s:%d", c.Hostname, c.Port)
+}
+
+func (c *MainConfig) GetStaticDir() string {
+	return c.StaticDir
+}
+
 func (c *MainConfig) GetTemplate(tplName string) *template.Template {
 	tplName = fmt.Sprintf("%s%s", tplName, templateExt)
 	return c.Templates.Lookup(tplName)
 }
 
-func getConfig() (cfg *MainConfig, err error) {
+func getConfig() (c *MainConfig, err error) {
 	viper.SetEnvPrefix(envPrefix)
 	viper.AutomaticEnv()
 
-	cfg = &MainConfig{}
+	c = &MainConfig{}
 
-	cfg.DevEnv = (viper.GetInt(envDev) == 1)
+	c.DevEnv = (viper.GetInt(envDev) == 1)
 
-	cfg.Hostname = viper.GetString(envHostname)
-	if cfg.Hostname == "" {
-		cfg.Hostname = defaultHostname
+	c.Hostname = viper.GetString(envHostname)
+	if c.Hostname == "" {
+		c.Hostname = defaultHostname
 	}
-	cfg.Port = viper.GetInt(envPort)
-	if cfg.Port == 0 {
-		cfg.Port = defaultPort
+	c.Port = viper.GetInt(envPort)
+	if c.Port == 0 {
+		c.Port = defaultPort
 	}
-	cfg.LogDisabled = (viper.GetInt(envLogDisabled) == 1)
-	cfg.LogRequestData = (viper.GetInt(envLogRequests) == 1)
+	c.LogDisabled = (viper.GetInt(envLogDisabled) == 1)
+	c.LogRequestData = (viper.GetInt(envLogRequests) == 1)
 
 	lLevelStr := viper.GetString(envLogLevel)
 	switch lLevelStr {
 	case lLevelError:
-		cfg.LogLevel = 2
+		c.LogLevel = 2
 		break
 	case lLevelWarning:
-		cfg.LogLevel = 1
+		c.LogLevel = 1
 		break
 	case lLevelInfo:
-		cfg.LogLevel = 0
+		c.LogLevel = 0
 		break
 	default:
-		cfg.LogLevel = defaultLogLevel
+		c.LogLevel = defaultLogLevel
 	}
 
-	cfg.AppName = appName
-	cfg.Version = version
-	cfg.StaticDir = defaultStaticDir
+	c.AppName = appName
+	c.Version = version
+	c.StaticDir = defaultStaticDir
 
 	err = func(funcs ...func() error) (er error) {
 		for _, f := range funcs {
@@ -121,7 +129,7 @@ func getConfig() (cfg *MainConfig, err error) {
 		}
 		return
 	}(
-		cfg.LoadTemplates,
+		c.LoadTemplates,
 		// Put config loader funcs here
 	)
 	return

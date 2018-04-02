@@ -7,25 +7,28 @@ import (
 )
 
 var Log logger
-var Cfg *MainConfig
+var Config *MainConfig
 
-func main() {
-	config, err := getConfig()
+func init() {
+	var err error
+	Config, err = getConfig()
 	if err != nil {
 		panic(err)
 	}
+	Log = NewLogger(Config)
+}
 
-	Log = NewLogger(config)
+func main() {
 
 	router := mux.NewRouter()
-	initViews(router, config)
-	initAPI(router, config)
+	initViews(router)
+	initAPI(router)
 
 	http.Handle("/", router)
 	http.Handle("/static/",
-		http.StripPrefix("/static/", http.FileServer(http.Dir(config.StaticDir))))
+		http.StripPrefix("/static/", http.FileServer(http.Dir(Config.GetStaticDir()))))
 
-	addr := fmt.Sprintf("%s:%d", config.Hostname, config.Port)
+	addr := Config.GetAddress()
 	fmt.Printf("Starting server on %s", addr)
 	http.ListenAndServe(addr, nil)
 }
