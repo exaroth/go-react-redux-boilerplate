@@ -24,8 +24,5 @@ compile:
 	GOOS=linux GOARCH=amd64 go build -o bin/${PROJECT}-linux-amd64;
 	GOOS=darwin GOARCH=amd64 go build -o bin/${PROJECT}-darwin-amd64;
 
-build:
-	clean
-	install
-	compile
+build: clean install compile
 
