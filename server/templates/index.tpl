@@ -6,8 +6,6 @@
     </head>
     <body>
         <div id="app"></div>
-        {{ .appName }}
-        {{ .developmentEnv }}
         {{ if not .developmentEnv }}
             <script src="/static/build/js/babel-polyfill.min.js"></script>
         {{ end }}

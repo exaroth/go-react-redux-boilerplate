@@ -3,7 +3,7 @@ PROJECT=app
 clean:
 	rm -Rf ./static/node_modules;
 	rm -Rf ./tmp;
-	rm -Rf ./bin;
+	rm -Rf ./build;
 
 serve:
 	fresh;
@@ -11,18 +11,24 @@ serve:
 watch:
 	cd ./static && webpack --config webpack.config.dev.js;
 
+webpack:
+	cd ./static && webpack
+
 test:
 	go test;
 	cd ./static && npm test;
 
 install:
-	go get -v ./...;
-	go get github.com/pilu/fresh;
-	cd static && npm install;
+	cd ./server && go get -v ./...;
+	cd ./server && go get github.com/pilu/fresh;
+	cd ./static && npm install;
 
 compile:
-	GOOS=linux GOARCH=amd64 go build -o bin/${PROJECT}-linux-amd64;
-	GOOS=darwin GOARCH=amd64 go build -o bin/${PROJECT}-darwin-amd64;
+	GOOS=linux GOARCH=amd64 go build -o ./build/${PROJECT}-linux-amd64 ./server/;
+	GOOS=darwin GOARCH=amd64 go build -o ./build/${PROJECT}-darwin-amd64 ./server/;
+	cp -Rf ./server/templates ./build
 
-build: clean install compile
+build: clean install webpack compile
+	mkdir ./build/static;
+	cp -Rf ./static/build ./build/static/build
 
