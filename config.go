@@ -9,15 +9,15 @@ import (
 )
 
 const (
-	appName            string = ""
-	defaultTemplateDir        = "./templates"
-	defaultStaticDir          = "./static/"
-	templateExt               = ".tpl"
-	defaultHostname           = "127.0.0.1"
-	version                   = "0.0.1"
-	lLevelWarning             = "warning"
-	lLevelInfo                = "info"
-	lLevelError               = "error"
+	appName                string = ""
+	defaultTemplateDirName        = "templates"
+	defaultStaticDirName          = "static"
+	templateExt                   = ".tpl"
+	defaultHostname               = "127.0.0.1"
+	version                       = "0.0.1"
+	lLevelWarning                 = "warning"
+	lLevelInfo                    = "info"
+	lLevelError                   = "error"
 )
 
 const (
@@ -53,14 +53,15 @@ type MainConfig struct {
 
 func (c *MainConfig) LoadTemplates() error {
 	templates := []string{}
-	files, err := ioutil.ReadDir(defaultTemplateDir)
+	templateDir := fmt.Sprintf("./%s", defaultTemplateDirName)
+	files, err := ioutil.ReadDir(templateDir)
 	if err != nil {
 		return err
 	}
 	for _, f := range files {
 		fName := f.Name()
 		if strings.HasSuffix(fName, templateExt) {
-			templates = append(templates, fmt.Sprintf("%s/%s", defaultTemplateDir, fName))
+			templates = append(templates, fmt.Sprintf("%s/%s", templateDir, fName))
 		}
 	}
 	if len(templates) == 0 {
@@ -119,7 +120,7 @@ func getConfig() (c *MainConfig, err error) {
 
 	c.AppName = appName
 	c.Version = version
-	c.StaticDir = defaultStaticDir
+	c.StaticDir = fmt.Sprintf("./%s", defaultStaticDirName)
 
 	err = func(funcs ...func() error) (er error) {
 		for _, f := range funcs {

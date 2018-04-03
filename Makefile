@@ -24,9 +24,9 @@ install:
 	cd ./static && npm install;
 
 compile:
-	GOOS=linux GOARCH=amd64 go build -o ./build/${PROJECT}-linux-amd64 ./server/;
-	GOOS=darwin GOARCH=amd64 go build -o ./build/${PROJECT}-darwin-amd64 ./server/;
-	cp -Rf ./server/templates ./build
+	GOOS=linux GOARCH=amd64 go build -o ./build/${PROJECT}-linux-amd64 .
+	GOOS=darwin GOARCH=amd64 go build -o ./build/${PROJECT}-darwin-amd64 .
+	cp -Rf ./templates ./build;
 
 build: clean install webpack compile
 	mkdir ./build/static;
