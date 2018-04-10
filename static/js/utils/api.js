@@ -4,20 +4,19 @@
  * within the React app
  */
 
-import axios from 'axios';
+import axios from "axios";
 
 class API {
-
-  constructor () {
-    this.apiEndpointBase = '/api',
+  constructor() {
+    this.apiEndpointBase = "/api";
     this.baseOptions = {
-      responseType: 'json',
+      responseType: "json",
       timeout: 60 * 1000,
       validateStatus: status => status >= 200 && status < 300,
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      }
     };
     this._call = this._call.bind(this);
     this._generateApiAddress = this._generateApiAddress.bind(this);
@@ -29,14 +28,14 @@ class API {
   }
 
   _handleResponse(responsePromise) {
-    return new Promise((resolve, reject) =>{
+    return new Promise((resolve, reject) => {
       responsePromise.then(
         response => resolve(response.data),
         error => {
-          if(error.response) {
+          if (error.response) {
             reject(error.response.data);
           } else {
-            reject(error)
+            reject(error);
           }
         }
       );
@@ -55,7 +54,7 @@ class API {
     let requestParams = {
       url: apiAddress,
       method: params.method,
-      data: params.data,
+      data: params.data
     };
 
     const response = makeRequest(requestParams);
@@ -67,11 +66,10 @@ class API {
   */
   getConfig() {
     return this._call({
-      method: 'get',
-      url: '/config',
+      method: "get",
+      url: "/config"
     });
   }
-
 }
 
 export const apiConnector = new API();

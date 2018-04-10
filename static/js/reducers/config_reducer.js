@@ -1,11 +1,11 @@
-import * as actions from 'actions/types';
+import { SET_CONFIG } from "actions/types";
 
 // Set application config
-export default function(state = null, action)  {
+export default function(state = null, action) {
   switch (action.type) {
-    case actions.SET_CONFIG:
+    case SET_CONFIG:
       return action.payload;
     default:
-      return state
+      return state;
   }
 }

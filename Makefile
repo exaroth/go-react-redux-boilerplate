@@ -14,6 +14,9 @@ watch:
 webpack:
 	cd ./static && webpack
 
+lint:
+	cd ./static && npm run lint
+
 test:
 	go test;
 	cd ./static && npm test;
