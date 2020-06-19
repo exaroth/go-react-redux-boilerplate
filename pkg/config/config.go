@@ -2,6 +2,9 @@ package config
 
 import (
 	"fmt"
+	"html/template"
+	"io/ioutil"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -97,34 +100,13 @@ type ServiceConfig struct {
 	TraceSampleRate    float64
 	TraceAlways        bool
 
+	Templates *template.Template
+
+	SentryDSN string
+
 	// this denotes how much time we should wait for response from the remote
 	// when making external requests.
 	RequestTimeout time.Duration
-}
-
-func (cfg *ServiceConfig) loadPrometheusEnvironment() error {
-	cfg.PrometheusServerAddr = viper.GetString("PROMETHEUS_EXPORTER_ADDR")
-	if cfg.PrometheusServerAddr == "" {
-		cfg.PrometheusServerAddr = defaultPrometheusAddr
-	}
-	cfg.PrometheusServerPort = viper.GetInt("PROMETHEUS_EXPORTER_PORT")
-	if cfg.PrometheusServerPort == 0 {
-		cfg.PrometheusServerPort = defaultPrometheusPort
-	}
-	return nil
-}
-
-func (cfg *ServiceConfig) loadTelemetryEnvironment() error {
-	cfg.StackdriverEnabled = viper.GetBool("STACKDRIVER_ENABLED")
-	cfg.TraceSampleRate = viper.GetFloat64("TRACE_SAMPLE_RATE")
-	cfg.TraceAlways = viper.GetBool("TRACE_ALWAYS")
-
-	period := viper.GetInt("REPORTING_PERIOD")
-	if period == 0 {
-		period = defaultReportingPeriod
-	}
-	cfg.ReportingPeriod = time.Duration(period) * time.Second
-	return nil
 }
 
 func (cfg *ServiceConfig) loadServerEnvironment() error {
@@ -158,6 +140,8 @@ func (cfg *ServiceConfig) loadServerEnvironment() error {
 		staticDir = defaultStaticDirName
 	}
 	cfg.StaticDir = staticDir
+
+	cfg.SentryDSN = viper.GetString("SENTRY_DSN")
 
 	cfg.RequestTimeout = time.Duration(viper.GetInt("REQUEST_TIMEOUT")) * time.Second
 
@@ -198,6 +182,34 @@ func (cfg *ServiceConfig) GetPrometheusAddr() string {
 	return ""
 }
 
+func (c *ServiceConfig) LoadTemplates() error {
+	templates := []string{}
+	templateDir := viper.GetString("TEMPLATE_DIR")
+	if templateDir == "" {
+		templateDir = fmt.Sprintf("./%s", defaultTemplateDirName)
+	}
+	files, err := ioutil.ReadDir(templateDir)
+	if err != nil {
+		return err
+	}
+	for _, f := range files {
+		fName := f.Name()
+		if strings.HasSuffix(fName, templateExt) {
+			templates = append(templates, fmt.Sprintf("%s/%s", templateDir, fName))
+		}
+	}
+	if len(templates) == 0 {
+		return nil
+	}
+	c.Templates, err = template.ParseFiles(templates...)
+	return err
+}
+
+func (c *ServiceConfig) GetTemplate(tplName string) *template.Template {
+	tplName = fmt.Sprintf("%s%s", tplName, templateExt)
+	return c.Templates.Lookup(tplName)
+}
+
 // NewConfig will create new config.
 func NewConfig() (*ServiceConfig, error) {
 	viper.AutomaticEnv()
@@ -213,9 +225,10 @@ func NewConfig() (*ServiceConfig, error) {
 		return nil
 	}(
 		cfg.loadServerEnvironment,
-		cfg.loadPrometheusEnvironment,
-		cfg.loadTelemetryEnvironment,
 	)
-
+	if err != nil {
+		return nil, err
+	}
+	err = cfg.LoadTemplates()
 	return cfg, err
 }

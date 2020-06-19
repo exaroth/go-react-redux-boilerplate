@@ -10,9 +10,13 @@ clean:
 serve:
 	fresh;
 
-.PHONY: watch
-watch:
+.PHONY: watch-js
+watch-js:
 	cd ./static && webpack --config webpack.config.dev.js;
+
+.PHONY: watch-go
+watch-go:
+	air -c air.conf
 
 .PHONY: fmt
 fmt:
@@ -57,7 +61,7 @@ install:
 .PHONY: compile
 compile:
 	GOOS=linux GOARCH=amd64 go build -a -o  ./build/${PROJECT}-linux-amd64 ./cmd/app/main.go
-	GOOS=darwin GOARCH=amd64 go build -a -o ./build/${PROJECT}-darwin-amd64 ./cmd/app/main.go
+	# GOOS=darwin GOARCH=amd64 go build -a -o ./build/${PROJECT}-darwin-amd64 ./cmd/app/main.go
 	cp -Rf ./templates ./build;
 
 .PHONY: build

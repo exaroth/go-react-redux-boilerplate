@@ -5,7 +5,6 @@ import (
 )
 
 func Init(router *mux.Router) {
-
 	router.HandleFunc("/", IndexView)
 	router.HandleFunc("/healthz", Healthz)
 }

@@ -2,6 +2,8 @@ package views
 
 import (
 	"net/http"
+
+	"github.com/exaroth/go-react-redux-boilerplate/pkg/logger"
 )
 
 var IndexView http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
@@ -12,13 +14,6 @@ var IndexView http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
-}
-
-func RenderTemplate(w http.ResponseWriter, tplName string, tplData map[string]interface{}) error {
-	// tpl := Config.GetTemplate(tplName)
-	// if tpl == nil {
-	// 	return fmt.Errorf("Template %s not found", tplName)
-	// }
-	// err := tpl.Execute(w, ctx)
-	return nil
+	logger := logger.Logger
+	logger.Error()
 }
