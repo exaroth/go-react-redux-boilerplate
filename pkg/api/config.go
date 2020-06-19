@@ -1,7 +1,24 @@
 package api
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/exaroth/go-react-redux-boilerplate/pkg/config"
+	"github.com/exaroth/go-react-redux-boilerplate/pkg/logger"
+	"github.com/pkg/errors"
+)
 
 var GetConfig http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
-	return
+
+	cfg := config.Config
+	response := map[string]interface{}{
+		"env": cfg.ServiceEnv,
+	}
+	err := json.NewEncoder(w).Encode(response)
+	if err != nil {
+		logger.Logger.Error(errors.Wrap(err, "Error parsing JSON response"))
+		json.NewEncoder(w).Encode(map[string]string{"error": "Internal Server Error"})
+	}
+
 }
