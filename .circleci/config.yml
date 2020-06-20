@@ -47,7 +47,7 @@ jobs:
           name: Test
           command: make test-go
       - store_test_results:
-        path: coverage.txt
+          path: coverage.txt
 
   build:
     executor: builder
