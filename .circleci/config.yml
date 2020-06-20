@@ -69,10 +69,10 @@ jobs:
             docker build .
 
 workflows:
-  version: 2
-  test_and_build:
+  version: 2.1
+  test-and-build:
     jobs:
-      - test
+      - test-go
       - build:
           requires:
-            - test
+            - test-go
