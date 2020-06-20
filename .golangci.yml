@@ -114,6 +114,3 @@ issues:
 
 run:
   modules-download-mode: readonly
-
-  skip-dirs:
-    - pkg/adapters/tessitura/pkg/gotess

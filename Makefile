@@ -49,6 +49,7 @@ install-go:
 
 .PHONY: setup
 setup:
+	/usr/bin/env ./.setup.sh
 	go get -t github.com/kyoh86/richgo 
 	go get -t golang.org/x/tools/cmd/goimports
 	go get -t github.com/golangci/golangci-lint/cmd/golangci-lint
