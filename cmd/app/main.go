@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-
 	cfg := config.Config
 
 	router := mux.NewRouter()
@@ -28,5 +27,8 @@ func main() {
 	log.Printf("Starting server on %s", addr)
 
 	http.Handle("/", router)
-	http.ListenAndServe(addr, nil)
+	err := http.ListenAndServe(addr, nil)
+	if err != nil {
+		panic(err)
+	}
 }

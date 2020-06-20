@@ -57,14 +57,11 @@ func NewServiceEnv(in string) (ServiceEnv, error) {
 }
 
 const (
-	defaultAppPort         int = 9000
-	defaultPrometheusPort      = 9102
-	defaultReportingPeriod     = 10
+	defaultAppPort int = 9000
 )
 
 const (
 	defaultAppAddr         string = "0.0.0.0"
-	defaultPrometheusAddr         = "0.0.0.0"
 	defaultStaticDirName          = "static"
 	defaultTemplateDirName        = "templates"
 	templateExt                   = ".tpl"
@@ -88,18 +85,7 @@ type ServiceConfig struct {
 	// ServicePort denotes port service is running at locally.
 	StaticDir string
 
-	// PrometheusServerAddr is address under which to run Prometheus exporter
-	PrometheusServerAddr string
-	// PrometheusServerPort is port under which to run Prometheus exporter
-	PrometheusServerPort int
-
-	// Telemetry Config
-	ReportingPeriod    time.Duration
-	StackdriverEnabled bool
-	StackdriverProject string
-	TraceSampleRate    float64
-	TraceAlways        bool
-
+	// Templates holds loaded template data for all app templates.
 	Templates *template.Template
 
 	SentryDSN string
@@ -149,23 +135,18 @@ func (cfg *ServiceConfig) loadServerEnvironment() error {
 }
 
 // This method will retrieve all applicable log levels to pass
-// to logrus hooks based on the defined base log level and debug
-// parameter.
-func (cfg *ServiceConfig) GetLogLevels(debug bool) []log.Level {
-	baseLLevel := cfg.LogLevel
-	if debug {
-		baseLLevel = log.DebugLevel
-	}
-
+// to logrus hooks based on the defined base log level.
+func (cfg *ServiceConfig) GetLogLevels() []log.Level {
 	lLevels := []log.Level{}
 
-	for i := 0; i <= int(baseLLevel); i++ {
+	for i := 0; i <= int(cfg.LogLevel); i++ {
 		lLevels = append(lLevels, log.Level(i))
 	}
 	return lLevels
 }
 
-func (c *ServiceConfig) GetStaticDir() string {
+// GetStaticDir will yield path to the static directory.
+func (cfg *ServiceConfig) GetStaticDir() string {
 	return fmt.Sprintf("./%s", defaultStaticDirName)
 }
 
@@ -174,15 +155,7 @@ func (cfg *ServiceConfig) GetServiceAddr() string {
 	return fmt.Sprintf("%s:%d", cfg.ServiceAddr, cfg.ServicePort)
 }
 
-// GetServiceAddr will retrieve local address of the service.
-func (cfg *ServiceConfig) GetPrometheusAddr() string {
-	if cfg.ServiceEnv == ServiceEnvProduction || cfg.ServiceEnv == ServiceEnvStaging {
-		return fmt.Sprintf("%s:%d", cfg.PrometheusServerAddr, cfg.PrometheusServerPort)
-	}
-	return ""
-}
-
-func (c *ServiceConfig) LoadTemplates() error {
+func (cfg *ServiceConfig) LoadTemplates() error {
 	templates := []string{}
 	templateDir := viper.GetString("TEMPLATE_DIR")
 	if templateDir == "" {
@@ -201,13 +174,13 @@ func (c *ServiceConfig) LoadTemplates() error {
 	if len(templates) == 0 {
 		return nil
 	}
-	c.Templates, err = template.ParseFiles(templates...)
+	cfg.Templates, err = template.ParseFiles(templates...)
 	return err
 }
 
-func (c *ServiceConfig) GetTemplate(tplName string) *template.Template {
+func (cfg *ServiceConfig) GetTemplate(tplName string) *template.Template {
 	tplName = fmt.Sprintf("%s%s", tplName, templateExt)
-	return c.Templates.Lookup(tplName)
+	return cfg.Templates.Lookup(tplName)
 }
 
 // NewConfig will create new config.

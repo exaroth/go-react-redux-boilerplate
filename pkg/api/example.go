@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var GetConfig http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
+var Example http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 
 	cfg := config.Config
 	response := map[string]interface{}{
@@ -18,7 +18,7 @@ var GetConfig http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
 		logger.Logger.Error(errors.Wrap(err, "Error parsing JSON response"))
-		json.NewEncoder(w).Encode(map[string]string{"error": "Internal Server Error"})
+		w.WriteHeader(500)
 	}
 
 }

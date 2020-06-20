@@ -5,5 +5,5 @@ import (
 )
 
 func Init(router *mux.Router) {
-	router.HandleFunc("/config", GetConfig).Methods("GET")
+	router.HandleFunc("/example", Example).Methods("GET")
 }

@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"net/http"
 	"reflect"
 
 	"github.com/exaroth/go-react-redux-boilerplate/pkg/config"
@@ -28,7 +27,6 @@ type Converter func(entry *logrus.Entry, event *sentry.Event, eventHint *sentry.
 // SentryHook represents sentry-logrus hook instance.
 type SentryHook struct {
 	client    *sentry.Client
-	r         *http.Request
 	cfg       *config.ServiceConfig
 	converter Converter
 }
@@ -49,16 +47,16 @@ func NewSentryHook(client *sentry.Client, cfg *config.ServiceConfig, conv Conver
 
 // Levels will return valid levels for the sentry hook.
 func (h *SentryHook) Levels() []logrus.Level {
-	return h.cfg.GetLogLevels(false)
+	return h.cfg.GetLogLevels()
 }
 
 // Fire will send new sentry event.
-func (hook *SentryHook) Fire(entry *logrus.Entry) error {
+func (h *SentryHook) Fire(entry *logrus.Entry) error {
 	event := sentry.NewEvent()
 	event.Level = levelMap[entry.Level]
 
-	hook.converter(entry, event, nil)
-	hook.client.CaptureEvent(event, nil, nil)
+	h.converter(entry, event, nil)
+	h.client.CaptureEvent(event, nil, nil)
 	return nil
 }
 
