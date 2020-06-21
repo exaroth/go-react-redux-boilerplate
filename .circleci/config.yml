@@ -1,0 +1,78 @@
+version: 2.1
+
+executors:
+  go:
+    parameters:
+      img:
+        type: string
+        default: "circleci/golang"
+        description: Build image
+      ver:
+        type: string
+        default: "1.14"
+        description: Image version
+    docker:
+      - image: << parameters.img >>:<< parameters.ver >>
+        environment:
+          GOFLAGS: -mod=readonly
+  js:
+    parameters:
+      img:
+        type: string
+        default: "circleci/node"
+        description: Build image
+      ver:
+        type: string
+        default: "14.2.0-browsers"
+        description: Image version
+    docker:
+      - image: << parameters.img >>:<< parameters.ver >>
+  builder:
+    docker:
+      - image: "docker:stable"
+
+jobs:
+  test-go:
+    executor: go
+    working_directory: /go/src/github.com/exaroth/go-react-redux-boilerplate
+    steps:
+      - checkout
+      - run:
+          name: Install test dependencies
+          command: go get -t github.com/golangci/golangci-lint/cmd/golangci-lint && go get -t github.com/kyoh86/richgo
+      - run:
+          name: Lint
+          command: make lint-go
+      - run:
+          name: Test
+          command: make test-go
+      - store_test_results:
+          path: coverage.txt
+
+  build:
+    executor: builder
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run: apk add --no-cache bash build-base
+      - run:
+          name: Pull golang:1.14
+          command: |
+            docker pull golang:1.14
+      - run:
+          name: Docker build image
+          command: |
+            docker build . --target builder
+      - run:
+          name: Docker build app
+          command: |
+            docker build .
+
+workflows:
+  version: 2.1
+  test-and-build:
+    jobs:
+      - test-go
+      - build:
+          requires:
+            - test-go

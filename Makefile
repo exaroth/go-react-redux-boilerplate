@@ -27,16 +27,28 @@ fmt:
 webpack:
 	cd ./static && webpack
 
-.PHONY: lint
-lint:
-	cd ./static && npm run lint
+.PHONY: lint-go
+lint-go:
 	golangci-lint run
 
-.PHONY: test
-test:
+.PHONY: lint-js
+lint-js:
+	cd ./static && npm run lint
+
+.PHONY: lint
+lint: lint-go lint-js
+
+.PHONY: test-js
+test-js:
 	cd ./static && npm test;
+
+.PHONY: test-go
+test-go:
 	richgo test ./... -mod=readonly -v
 	richgo test -v -race -coverpkg=./... -coverprofile=coverage.txt ./... -mod=readonly
+
+.PHONY: test
+test: test-js test-go
 
 .PHONY: install-js
 install-js:
@@ -47,19 +59,10 @@ install-go:
 	go get -u -v ./...
 	go mod tidy
 
-.PHONY: setup
-setup:
-	/usr/bin/env ./.setup.sh
-	go get -t github.com/kyoh86/richgo 
-	go get -t golang.org/x/tools/cmd/goimports
-	go get -t github.com/golangci/golangci-lint/cmd/golangci-lint
-
 .PHONY: install
-install:
-	$(MAKE) install-js
-	$(MAKE) install-go
+install: install-js install-go
 
-.PHONY: compile
+.PHONY: compile-
 compile:
 	GOOS=linux GOARCH=amd64 go build -a -o  ./build/${PROJECT}-linux-amd64 ./cmd/app/main.go
 	# GOOS=darwin GOARCH=amd64 go build -a -o ./build/${PROJECT}-darwin-amd64 ./cmd/app/main.go
@@ -70,3 +73,9 @@ build: clean install webpack compile
 	mkdir ./build/static;
 	cp -Rf ./static/build ./build/static/build
 
+.PHONY: local-setup
+local-setup:
+	/usr/bin/env ./.setup.sh
+	go get -t github.com/kyoh86/richgo 
+	go get -t golang.org/x/tools/cmd/goimports
+	go get -t github.com/golangci/golangci-lint/cmd/golangci-lint
