@@ -8,6 +8,6 @@ require (
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/gorilla/mux v1.7.4
 	github.com/pkg/errors v0.9.1
-	github.com/sirupsen/logrus v1.6.0
+	github.com/sirupsen/logrus v1.8.3
 	github.com/spf13/viper v1.7.0
 )
